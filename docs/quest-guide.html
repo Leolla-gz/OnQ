@@ -20,6 +20,10 @@
   h1 { color: var(--gold); font-size: 54px; letter-spacing: 2px; }
   header p { color: #e8d9b8; font-size: 23px; }
   .brand { flex-basis: 100%; }
+  /* P‐ON‐菓子屋の「使い方」一覧へ戻るリンク（help/portal.html の doc__back と同じ行き先） */
+  .back { flex-basis: 100%; margin-bottom: 6px; }
+  .back a { display: inline-flex; color: #e8d9b8; transition: color 0.2s; }
+  .back a:hover, .back a:focus-visible { color: var(--gold); }
   .brand span { display: inline-block; background: var(--gold); color: #1a0f07; font-weight: bold; font-size: 26px;
     letter-spacing: 1px; padding: 2px 16px 3px 6px; border-radius: 4px; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
@@ -89,6 +93,19 @@
   .face::after { content: ""; position: absolute; left: 8px; top: 20px; width: 6px; height: 6px; background: #fff;
     box-shadow: 6px 0 0 var(--eye), 16px 0 0 var(--eye), 22px 0 0 #fff; }
   .cols { display: grid; grid-template-columns: 1fr 250px; gap: 18px; align-items: start; }
+  /* ---- 6章：クエストボードの作り方（3×3 の壁と光る本の絵） ---- */
+  .blocks { display: grid; grid-template-columns: repeat(3, 40px); gap: 2px; position: relative; }
+  .blk { width: 40px; height: 40px; background: #b38a4f; border: 2px solid #6b4d24; }
+  .blk.c { outline: 4px solid #ffe14d; outline-offset: -2px; }
+  .book { font-size: 64px; filter: drop-shadow(0 0 10px #c9a0ff) drop-shadow(0 0 18px #9b6bff); }
+  .who { display: inline-block; font-size: 17px; font-weight: bold; padding: 0 10px; border-radius: 4px;
+    margin-left: 8px; vertical-align: 3px; }
+  .who.all { background: var(--green); color: #fff; } .who.op { background: var(--red); color: #fff; }
+  .made h3 { font-size: 23px; margin-bottom: 8px; }
+  ol.how { list-style: none; counter-reset: how; }
+  ol.how li::before { counter-increment: how; content: counter(how); background: var(--gold); color: #1a0f07;
+    font-weight: bold; font-size: 15px; width: 20px; height: 20px; border-radius: 3px; display: inline-flex;
+    align-items: center; justify-content: center; top: 6px; }
   footer { color: #cbb892; font-size: 18px; margin-top: 18px; text-align: right; }
 
   /* ---- 画面が狭いとき（タブレット・スマホ）は、横に並べていた物を縦に積む ---- */
@@ -119,11 +136,16 @@
     .cells { gap: 12px; }
     .note { font-size: 15.5px; }
     footer { font-size: 15px; text-align: left; }
+    .made h3 { font-size: 19px; }
+    .book { font-size: 48px; }
   }
 </style>
 </head>
 <body>
 <header>
+  <!-- 使い方の一覧へ戻るボタン（ほかのツールと同じ「○の中に＜」）。
+       ポータル内（public/help/）に置く前提の相対パス。../#help で「使い方」タブが開く -->
+  <div class="back"><a href="../#help" aria-label="使い方の一覧へ戻る" title="使い方の一覧へ戻る"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M13.5 8l-4 4 4 4" /></svg></a></div>
   <div class="brand"><span>【OnQ】 Online Quest</span></div>
   <h1>クエストボードの使い方</h1>
   <p>欲しいアイテムを「依頼」として張り出し、みんなに納品してもらう仕組みです</p>
@@ -216,6 +238,40 @@
       <li><b>ログインしていない間のこと</b>（達成・受注など）→ 次にログインしたときにまとめて表示</li>
       <li><b>見本のアイテムを持っている</b> → 手に持って <code>/quest create hand 個数</code> でも依頼できます</li>
     </ul>
+  </section>
+
+  <section class="wide">
+    <h2><span class="no">6</span>クエストボードを作る</h2>
+    <div class="grid">
+      <div class="made">
+        <div class="pic grass"><span class="book">📖</span><div class="tag" style="top:12px;left:50%;transform:translateX(-50%)">持って右クリック</div></div>
+        <h3>光る本（持ち歩けるボード）<span class="who all">だれでも</span></h3>
+        <ol class="how">
+          <li><b>本</b>を1冊、手に持つ</li>
+          <li>チャットで <code>/quest boarditem</code> → 本が<b>光る本</b>に変わる</li>
+          <li>光る本を持って<b>右クリック</b>すると、どこでもクエスト一覧の画面が開く</li>
+        </ol>
+        <p class="note" style="margin-top:8px">本は 革1枚＋紙3枚 で作れます。光る本は何冊作っても大丈夫です。</p>
+      </div>
+      <div class="made">
+        <div class="pic grass"><div class="blocks" style="margin-top:34px">
+          <div class="blk"></div><div class="blk"></div><div class="blk"></div>
+          <div class="blk"></div><div class="blk c"></div><div class="blk"></div>
+          <div class="blk"></div><div class="blk"></div><div class="blk"></div>
+        </div><div class="tag" style="top:8px;left:50%;transform:translateX(-50%)">まん中を右クリック</div></div>
+        <h3>壁のクエストボード（みんなの掲示板）<span class="who op">管理者(OP)</span></h3>
+        <ol class="how">
+          <li><b>横3×縦3ブロック</b>の壁を作る（例：樫の板材）。前に2ブロックほど空けておく</li>
+          <li>チャットで <code>/quest board add</code></li>
+          <li>60秒以内に、壁の<b>まん中のブロックの正面</b>を右クリック → 数秒で依頼が壁に浮かんで並ぶ</li>
+        </ol>
+        <ul style="margin-top:8px">
+          <li>表示が崩れた・消えた → <code>/quest board refresh</code></li>
+          <li>ボードをやめる → <code>/quest board remove</code> のあと、そのブロックを右クリック（壊しても自動で解除）</li>
+        </ul>
+        <p class="note" style="margin-top:8px">OP でない人は、置きたい場所を管理者に伝えてください。</p>
+      </div>
+    </div>
   </section>
 
   <section class="wide">
