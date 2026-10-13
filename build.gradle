@@ -1,0 +1,38 @@
+// ビルド設定ファイル（C言語でいう Makefile に相当）
+plugins {
+	// 26.x の Minecraft は難読化されていないので、remap なしの通常版 Loom を使う
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.maven_group
+base {
+	archivesName = project.archives_base_name
+}
+
+dependencies {
+	// コンパイル対象の Minecraft 本体（26.x は最初から公式の名前なので mappings 指定は不要）
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	// mod ローダーと Fabric API（イベント・コマンド登録に使う）
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+processResources {
+	// fabric.mod.json 内の ${version} を実際のバージョン番号に置き換える
+	def version = project.version
+	inputs.property "version", version
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+	it.options.encoding = 'UTF-8'   // 日本語コメント・メッセージを正しく扱う
+}
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}

@@ -1,0 +1,13 @@
+// Gradle が「プラグイン（Fabric Loom）」をどこから取ってくるかの設定
+pluginManagement {
+	repositories {
+		maven {
+			name = 'Fabric'
+			url = 'https://maven.fabricmc.net/'
+		}
+		mavenCentral()
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = 'questboard'

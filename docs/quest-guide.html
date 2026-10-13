@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>【OnQ】 Online Quest - クエストボードの使い方</title>
+<style>
+  :root {
+    --wood: #2b1a0e; --wood2: #3a2514; --paper: #f6ecd4; --paper2: #efe1c0; --ink: #2a1c10;
+    --gold: #e9a520; --aqua: #1f8a8a; --green: #3f8f3a; --red: #b5432f; --gray: #6b5a48;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: var(--wood); }
+  body {
+    max-width: 1600px; margin: 0 auto; background: var(--wood); color: var(--ink);
+    font-family: "Yu Gothic UI", "Yu Gothic", "Meiryo", sans-serif; font-size: 21px; line-height: 1.5;
+    padding: 36px 40px 30px;
+  }
+  header { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 24px; margin-bottom: 22px; }
+  h1 { color: var(--gold); font-size: 54px; letter-spacing: 2px; }
+  header p { color: #e8d9b8; font-size: 23px; }
+  .brand { flex-basis: 100%; }
+  .brand span { display: inline-block; background: var(--gold); color: #1a0f07; font-weight: bold; font-size: 26px;
+    letter-spacing: 1px; padding: 2px 16px 3px 6px; border-radius: 4px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  section { background: var(--paper); border: 4px solid #1a0f07; border-radius: 6px; padding: 20px 24px 22px;
+    box-shadow: 0 5px 0 #150c05; }
+  section.wide { grid-column: 1 / 3; }
+  h2 { font-size: 30px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    border-bottom: 3px solid var(--paper2); padding-bottom: 8px; }
+  h2 .no { background: var(--gold); color: #1a0f07; width: 42px; height: 42px; border-radius: 4px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 26px; flex: none; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .step { background: var(--paper2); border-radius: 6px; padding: 14px 16px; position: relative; }
+  .step b.n { color: var(--red); font-size: 22px; display: block; margin-bottom: 4px; }
+  .step:not(:last-child)::after { content: "▶"; position: absolute; right: -15px; top: 42%; color: var(--gold);
+    font-size: 20px; z-index: 1; }
+  code, .cmd { font-family: Consolas, "Yu Gothic UI", monospace; background: #1a0f07; color: #7fe0e0;
+    padding: 2px 9px; border-radius: 4px; font-size: 20px; white-space: nowrap; }
+  .btn { background: #fff; border: 2px solid var(--aqua); color: var(--aqua); font-weight: bold;
+    padding: 0 8px; border-radius: 4px; white-space: nowrap; font-size: 19px; }
+  ul { list-style: none; }
+  li { padding-left: 26px; position: relative; margin: 7px 0; }
+  li::before { content: "◆"; position: absolute; left: 2px; color: var(--gold); font-size: 15px; top: 5px; }
+  .note { color: var(--gray); font-size: 18.5px; }
+  .em { color: var(--red); font-weight: bold; }
+  .ok { color: var(--green); font-weight: bold; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 7px 10px; border-bottom: 2px solid var(--paper2); vertical-align: top; }
+  td:first-child { width: 330px; }
+  .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 26px; }
+  .bars { background: #1a0f07; border-radius: 6px; padding: 12px 16px; margin-top: 10px; color: #fff; font-size: 18px; }
+  .bar { height: 9px; background: #4a3a2a; border-radius: 2px; margin: 3px 0 9px; overflow: hidden; }
+  .bar i { display: block; height: 100%; }
+  /* ---- イメージ図（ゲーム画面を模した絵。すべて CSS で描いている） ---- */
+  .pic { height: 178px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+    background: #7fb2e5; border-radius: 6px; border: 3px solid #1a0f07; overflow: hidden; position: relative; }
+  .pic.dark { background: #20160d; }
+  .pic.grass { background: linear-gradient(#8ec3f0 0 62%, #5d9c3a 62% 70%, #7a5230 70%); }
+  .inv { background: #c6c6c6; border: 3px solid; border-color: #fff #555 #555 #fff; padding: 6px 7px 7px; border-radius: 3px; }
+  .inv .t { font-size: 13px; color: #3f3f3f; line-height: 1; margin: 0 0 5px 2px; font-weight: bold; }
+  .row { display: flex; gap: 2px; margin-bottom: 2px; }
+  .sl { width: 30px; height: 30px; background: #8b8b8b; border: 2px solid; border-color: #373737 #fff #fff #373737;
+    display: flex; align-items: center; justify-content: center; font-size: 17px; line-height: 1; position: relative; }
+  .sl.g { background: #6e6e6e; } .sl.r { background: #c0483a; } .sl.l { background: #7fcf3f; }
+  .sl.hl { outline: 3px solid #ffe14d; outline-offset: -1px; z-index: 1; }
+  .sl small { position: absolute; right: 1px; bottom: 0; font-size: 10px; color: #fff; text-shadow: 1px 1px 0 #333; font-weight: bold; }
+  .sl b { font-size: 10px; color: #fff; text-shadow: 1px 1px 0 #333; }
+  .chatbox { background: rgba(0,0,0,.62); color: #fff; font-family: Consolas, monospace; font-size: 20px;
+    padding: 9px 14px; width: 84%; border-radius: 2px; }
+  .chatbox i { display: inline-block; width: 10px; height: 20px; background: #fff; vertical-align: -3px; margin-left: 2px; }
+  .chest { width: 84px; height: 78px; background: #a0722a; border: 5px solid #3d2a10; position: relative;
+    box-shadow: inset 0 -30px 0 #8a6122; }
+  .chest::before { content: ""; position: absolute; left: -5px; right: -5px; top: 24px; height: 5px; background: #3d2a10; }
+  .chest::after { content: ""; position: absolute; left: 33px; top: 18px; width: 12px; height: 18px; background: #d8d8d8;
+    border: 2px solid #555; }
+  .tag { position: absolute; background: #ffe14d; color: #1a0f07; font-weight: bold; font-size: 16px; padding: 2px 9px;
+    border-radius: 4px; border: 2px solid #1a0f07; white-space: nowrap; }
+  .wall { background: repeating-linear-gradient(#a8814a 0 28px, #8f6b3a 28px 30px); width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+  .wtitle { background: rgba(43,26,14,.82); color: #f2b632; font-weight: bold; font-size: 17px; padding: 1px 12px; }
+  .wtitle span { color: #7fe0e0; margin: 0 14px; }
+  .cells { display: flex; gap: 34px; }
+  .cell { text-align: center; color: #fff; font-size: 14px; line-height: 1.35; }
+  .cell div.tx { background: rgba(43,26,14,.82); padding: 1px 8px; margin-top: 4px; }
+  .cell .tx u { color: #ffe14d; text-decoration: none; font-weight: bold; } .cell .tx em { color: #7fe07f; font-style: normal; }
+  .face { width: 44px; height: 44px; margin: 0 auto; position: relative; border: 2px solid #1a0f07; }
+  .face::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 13px; background: var(--hair); }
+  .face::after { content: ""; position: absolute; left: 8px; top: 20px; width: 6px; height: 6px; background: #fff;
+    box-shadow: 6px 0 0 var(--eye), 16px 0 0 var(--eye), 22px 0 0 #fff; }
+  .cols { display: grid; grid-template-columns: 1fr 250px; gap: 18px; align-items: start; }
+  footer { color: #cbb892; font-size: 18px; margin-top: 18px; text-align: right; }
+
+  /* ---- 画面が狭いとき（タブレット・スマホ）は、横に並べていた物を縦に積む ---- */
+  @media (max-width: 1200px) {
+    body { padding: 24px 20px; font-size: 19px; }
+    h1 { font-size: 42px; }
+    .grid { grid-template-columns: 1fr; }
+    section.wide { grid-column: auto; }
+    .steps { grid-template-columns: 1fr 1fr; }
+    .step:not(:last-child)::after { display: none; }
+    .rules { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    body { padding: 16px 12px; font-size: 17px; }
+    h1 { font-size: 30px; letter-spacing: 0; }
+    header p { font-size: 17px; }
+    .brand span { font-size: 18px; }
+    h2 { font-size: 22px; }
+    h2 .no { width: 34px; height: 34px; font-size: 20px; }
+    section { padding: 14px 14px 16px; }
+    .steps, .rules, .cols { grid-template-columns: 1fr; }
+    code, .cmd { font-size: 16px; white-space: normal; }
+    .btn { font-size: 16px; }
+    td { display: block; border-bottom: none; padding: 4px 4px; }
+    td:first-child { width: auto; padding-top: 10px; }
+    tr { display: block; border-bottom: 2px solid var(--paper2); padding-bottom: 6px; }
+    .wtitle { font-size: 12px; } .wtitle span { margin: 0 5px; }
+    .cells { gap: 12px; }
+    .note { font-size: 15.5px; }
+    footer { font-size: 15px; text-align: left; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span>【OnQ】 Online Quest</span></div>
+  <h1>クエストボードの使い方</h1>
+  <p>欲しいアイテムを「依頼」として張り出し、みんなに納品してもらう仕組みです</p>
+</header>
+
+<div class="grid">
+  <section class="wide">
+    <h2><span class="no">1</span>依頼を出す（欲しいアイテムを募集する）</h2>
+    <div class="steps">
+      <div class="step"><div class="pic grass"><div class="chatbox">/quest pick<i></i></div></div><b class="n">① 画面を開く</b>
+        チャットで <code>/quest pick</code><br>
+        <span class="note">または、クエスト一覧の画面の <span class="btn">依頼を出す</span>（本と羽根ペン）</span></div>
+      <div class="step"><div class="pic dark"><div class="inv"><div class="t">依頼するアイテムを選ぶ</div>
+        <div class="row"><div class="sl">🪵</div><div class="sl">🧱</div><div class="sl hl">⚫</div><div class="sl">🌾</div><div class="sl">🦴</div><div class="sl">🍞</div><div class="sl">💎</div><div class="sl">🧵</div><div class="sl">🥕</div></div>
+        <div class="row"><div class="sl g"></div><div class="sl r"><b>-64</b></div><div class="sl r"><b>-10</b></div><div class="sl r"><b>-1</b></div><div class="sl">📄</div><div class="sl l"><b>+1</b></div><div class="sl l"><b>+10</b></div><div class="sl l"><b>+64</b></div><div class="sl g"></div></div>
+        <div class="row" style="margin:0"><div class="sl g">⬅</div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g hl">🟢</div></div>
+      </div></div><b class="n">② アイテムを選ぶ</b>
+        分類 → アイテム → 個数（<b>−64 … ＋64</b>）→ <span class="btn">決定</span>（エメラルド）<br>
+        <span class="note">名前を覚えていなくても、絵から選べます</span></div>
+      <div class="step"><div class="pic dark"><div class="inv"><div class="t">クエスト #3 の納品物</div>
+        <div class="row"><div class="sl">⚫</div><div class="sl">🪵</div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div></div>
+        <div class="row"><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div></div>
+        <div class="row" style="margin:0"><div class="sl g hl">✍</div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g">📖</div><div class="sl g"></div><div class="sl g"></div><div class="sl g"></div><div class="sl g hl">🚪</div></div>
+      </div></div><b class="n">③ 確認して終了</b>
+        ほかにも欲しい物があれば <span class="btn">アイテムを追加</span>。<br>
+        まちがえた品物は<b>クリックで削除</b>。<br>
+        よければ <span class="btn">終了</span>（樫のドア）</div>
+      <div class="step"><div class="pic grass"><div class="chest" style="margin-top:42px"></div><div class="tag" style="top:14px;left:50%;transform:translateX(-50%)">右クリック！</div></div><b class="n">④ 納品チェストを決める</b>
+        「チェストを右クリック」と出たら、<b>届けてほしいチェストを右クリック</b>（60秒以内）<br>
+        <span class="note">チェスト・樽・シュルカーボックスが使えます</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="no">2</span>依頼を見る・受注(ブックマーク)する</h2>
+    <div class="pic" style="height:190px"><div class="wall">
+      <div class="wtitle"><span>[◀ 前]</span>クエストボード　掲示中 8 件（1/2 ページ）<span>[次 ▶]</span></div>
+      <div class="cells">
+        <div class="cell"><div class="face" style="background:#c99a74;--hair:#4a2f1a;--eye:#3a4fb0"></div><div class="tx"><u>#1</u> Steve<br>石炭 3/10</div></div>
+        <div class="cell"><div class="face" style="background:#e3b38f;--hair:#d9822b;--eye:#2f7a3a"></div><div class="tx"><u>#2</u> Alex<br><em>原木 32/32</em></div></div>
+        <div class="cell"><div class="face" style="background:#c99a74;--hair:#222;--eye:#333"></div><div class="tx"><u>#3</u> Notch<br>パン 0/16</div></div>
+      </div></div></div>
+    <ul>
+      <li><b>壁のクエストボード</b>：依頼を <b>左クリック</b> で詳細、<b>右クリック</b> で受注(ブックマーク)。
+        7件以上あるときは <span class="btn">◀ 前</span> <span class="btn">次 ▶</span> でページ送り</li>
+      <li><b>クエスト一覧の画面</b>（チェストを開いたときのような画面に、依頼が全部並ぶ）：<code>/quest open</code> で開く。壁のクエストボードのブロックを右クリックしても開く。
+        依頼書を <b>左クリック</b> で受注(ブックマーク)、<b>右クリック</b> で詳細</li>
+      <li><b>チャットで一覧</b>：<code>/quest list</code>（5件ずつ）</li>
+    </ul>
+    <p class="note" style="margin-top:10px">受注(ブックマーク)は「やります」の目印です。何人でも受注でき、受注していなくても納品できます。</p>
+  </section>
+
+  <section>
+    <h2><span class="no">3</span>納品する</h2>
+    <ul>
+      <li>依頼の<b>納品チェストに品物を入れて、閉じるだけ</b>。閉じたときに数えられます</li>
+      <li>納品チェストに<b>カーソルを合わせる</b>と、画面の上に進み具合が出ます</li>
+      <li>全部そろうと<span class="ok">「達成！」</span>と全員に知らされ、依頼は消えます。品物は依頼主がチェストから受け取ります</li>
+    </ul>
+    <div class="cols"><div class="bars" style="margin-top:6px">
+      <span style="color:#f2b632">納品チェスト #3 Steve「拠点前」</span>
+      <div class="bar"><i style="width:55%;background:#f2c832"></i></div>
+      石炭 3/10（残り 7）
+      <div class="bar"><i style="width:30%;background:#ddd"></i></div>
+      <span style="color:#7fe07f">樫の板材 5/5 ✔</span>
+      <div class="bar" style="margin-bottom:0"><i style="width:100%;background:#5fcf5f"></i></div>
+    </div>
+    <div class="pic grass" style="height:168px;margin:6px 0 0"><div class="chest" style="margin-top:44px"></div><div class="tag" style="top:12px;left:50%;transform:translateX(-50%)">見るだけで表示</div></div></div>
+  </section>
+
+  <section>
+    <h2><span class="no">4</span>自分の依頼を確認・直す</h2>
+    <table>
+      <tr><td><code>/quest mine</code></td><td>自分の依頼の進み具合。<span class="btn">編集</span> <span class="btn">取消</span> ボタン付き</td></tr>
+      <tr><td><code>/quest pick 番号</code></td><td>納品物の追加・削除（編集画面）</td></tr>
+      <tr><td><code>/quest name 番号 名前</code></td><td>クエスト名を付ける（何に使うのか）。例: <code>/quest name 3 拠点の壁の材料</code></td></tr>
+      <tr><td><code>/quest memo 番号 メモ</code></td><td>納品チェストの場所のメモを付ける。例: <code>/quest memo 3 拠点前</code>　メモを書かずに打つと消える</td></tr>
+      <tr><td><code>/quest chest 番号</code></td><td>納品チェストを選び直す</td></tr>
+      <tr><td><code>/quest cancel 番号</code></td><td>依頼を取り消す</td></tr>
+      <tr><td><code>/quest info 番号</code></td><td>依頼の詳細・残り日数</td></tr>
+      <tr><td><code>/quest help</code></td><td>コマンドの一覧</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="no">5</span>こんなときは</h2>
+    <ul>
+      <li><b>使用中のチェストを選んだ</b> → 共有するなら<b>同じチェストをもう一度右クリック</b>。やめるなら別のチェストを右クリック</li>
+      <li><b>納品チェストが壊された</b> → 依頼主に知らせが届きます。<code>/quest chest 番号</code> で選び直せば、続きから再開</li>
+      <li><b>ログインしていない間のこと</b>（達成・受注など）→ 次にログインしたときにまとめて表示</li>
+      <li><b>見本のアイテムを持っている</b> → 手に持って <code>/quest create hand 個数</code> でも依頼できます</li>
+    </ul>
+  </section>
+
+  <section class="wide">
+    <h2><span class="no">!</span>きまり</h2>
+    <ul class="rules">
+      <li>同時に出せる依頼は <span class="em">1人5件</span> まで</li>
+      <li>1件の依頼に <span class="em">10種類</span> まで</li>
+      <li>合計で <span class="em">チェスト1個分（27マス）</span> まで</li>
+      <li>発注から <span class="em">14日</span> で自動的に取り消し</li>
+      <li>納品チェストに<span class="em">最初から入っていた分は数えない</span></li>
+      <li>依頼主が取り出した分は「受け取り済み」。<span class="em">ほかの人が取り出すと進み具合が戻る</span></li>
+      <li>ラージチェストは左右どちらを選んでも同じチェスト</li>
+      <li>納品先はチェスト・樽・シュルカーボックスのみ</li>
+      <li>アイテムは種類だけを見ます（耐久やエンチャントは問いません）</li>
+    </ul>
+  </section>
+</div>
+<footer>【OnQ】 Online Quest - クエストボード mod（参加する人は mod 不要・バニラのままで使えます）</footer>
+</body>
+</html>
