@@ -787,12 +787,34 @@ public final class QuestManager {
 		long now = System.currentTimeMillis();
 		for (Quest quest : List.copyOf(data.quests)) {
 			// createdAt が 0 のもの（日時の記録が無い古いデータ）は対象にしない
-			if (quest.createdAt > 0 && now - quest.createdAt >= EXPIRE_DAYS * DAY_MS) {
+			if (quest.createdAt > 0 && now >= expiresAt(quest)) {
 				String chest = quest.chest != null ? "。納品チェスト " + quest.chestLabel() + " に品物が残っていれば回収してください" : "";
 				cancel(quest);
-				notice(quest, "クエスト #" + quest.id + " は発注から " + EXPIRE_DAYS + " 日たったため、自動で取り消されました" + chest);
+				notice(quest, "クエスト #" + quest.id + " は発注から " + totalDays(quest) + " 日たったため、自動で取り消されました" + chest);
 			}
 		}
+	}
+
+	/** 自動取り消しになる日時（UNIX ミリ秒） */
+	private static long expiresAt(Quest quest) {
+		return quest.createdAt + totalDays(quest) * DAY_MS;
+	}
+
+	/** 発注から自動取り消しまでの日数（14 日 + OP が延ばした日数） */
+	public static int totalDays(Quest quest) {
+		return EXPIRE_DAYS + quest.extendedDays;
+	}
+
+	/**
+	 * 期限を延ばす（OP 用）。依頼主に知らせる
+	 * @return 延ばした後の残り日数
+	 */
+	public int extendExpiry(Quest quest, int days) {
+		quest.extendedDays += days;
+		save();
+		int left = daysLeft(quest);
+		notice(quest, "クエスト #" + quest.id + quest.titleLabel() + " の期限が管理者によって " + days + " 日延びました（あと " + left + " 日）");
+		return left;
 	}
 
 	/** 自動取り消しまでの残り日数（切り上げ。期限を過ぎていれば 0）。日時の記録が無ければ -1 */
@@ -800,7 +822,7 @@ public final class QuestManager {
 		if (quest.createdAt <= 0) {
 			return -1;
 		}
-		long left = quest.createdAt + EXPIRE_DAYS * DAY_MS - System.currentTimeMillis();
+		long left = expiresAt(quest) - System.currentTimeMillis();
 		return (int) Math.max(0, (left + DAY_MS - 1) / DAY_MS);
 	}
 

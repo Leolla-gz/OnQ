@@ -15,6 +15,8 @@ public final class Quest {
 	public String ownerName;
 	/** 作成日時（UNIXミリ秒） */
 	public long createdAt;
+	/** OP が延ばした期限の日数（/quest extend）。自動取り消しは発注から「14 日 + この日数」後 */
+	public int extendedDays;
 	/** クエスト名（何に使う物を集めているのか。例: 「拠点の壁の材料」）。無ければ null */
 	public String title;
 	/** 納品条件の一覧 */

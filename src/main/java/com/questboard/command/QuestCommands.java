@@ -173,6 +173,12 @@ public final class QuestCommands {
 						.then(Commands.literal("clear")
 								.requires(QuestCommands::canManageBoards)
 								.executes(QuestCommands::clearGuide)))
+				// クエストの期限を延ばす（OP）。ボードの管理と同じ権限
+				.then(Commands.literal("extend")
+						.requires(QuestCommands::canManageBoards)
+						.then(questIdArgument()
+								.then(Commands.argument("days", IntegerArgumentType.integer(1, 365))
+										.executes(QuestCommands::extend))))
 				// クエスト番号の振り直し（テストで番号が大きくなったとき用）。ボードの管理と同じ権限
 				.then(Commands.literal("resetid")
 						.requires(QuestCommands::canManageBoards)
@@ -524,6 +530,20 @@ public final class QuestCommands {
 		return run(c, source -> {
 			manager().setGuideUrl(null);
 			source.sendSuccess(() -> Texts.success("説明ページの URL を未設定に戻しました"), false);
+		});
+	}
+
+	/** /quest extend <番号> <日数>: クエストの期限を延ばす（OP） */
+	private static int extend(CommandContext<CommandSourceStack> c) {
+		int days = IntegerArgumentType.getInteger(c, "days");
+		return run(c, source -> {
+			Quest quest = manager().getQuest(IntegerArgumentType.getInteger(c, "id"));
+			if (QuestManager.daysLeft(quest) < 0) {
+				throw new QuestException("クエスト #" + quest.id + " は発注日時の記録が無いため、期限がありません（自動取り消しされません）");
+			}
+			int left = manager().extendExpiry(quest, days);
+			source.sendSuccess(() -> Texts.success("クエスト #" + quest.id + " の期限を " + days + " 日延ばしました（あと " + left
+					+ " 日。発注から " + QuestManager.totalDays(quest) + " 日で自動取り消し）"), false);
 		});
 	}
 

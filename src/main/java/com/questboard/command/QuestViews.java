@@ -78,7 +78,7 @@ public final class QuestViews {
 		out.accept(Component.literal("納品先: " + chestText(quest)));
 		int daysLeft = QuestManager.daysLeft(quest);
 		if (daysLeft >= 0) {
-			out.accept(Component.literal("期限: あと " + daysLeft + " 日（発注から " + QuestManager.EXPIRE_DAYS + " 日で自動取り消し）"));
+			out.accept(Component.literal("期限: あと " + daysLeft + " 日（発注から " + QuestManager.totalDays(quest) + " 日で自動取り消し）"));
 		}
 		out.accept(Component.literal("納品物:"));
 		for (int i = 0; i < quest.requirements.size(); i++) {
@@ -186,6 +186,7 @@ public final class QuestViews {
 		line(out, "/quest board list", "ボードの場所一覧");
 		line(out, "/quest board refresh", "壁のボードの表示を作り直す");
 		line(out, "/quest board demo <件数> | clear", "表示確認用の見本クエストを作る/消す");
+		line(out, "/quest extend <番号> <日数>", "クエストの期限（自動取り消しまでの日数）を延ばす");
 		line(out, "/quest resetid", "クエスト番号を振り直す（掲示中が無ければ次は #1 から）");
 		line(out, "/quest guide set <URL> | clear", "/quest guide で表示する説明ページの URL を設定/解除");
 		line(out, "/quest cancel <番号>", "ほかの人の依頼も取り消せる");
